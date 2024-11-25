@@ -1,0 +1,22 @@
+<div
+  class="app-tooltip tooltip-container {{ position || 'bottom' }}"
+  [ngStyle]="{
+    top: top,
+    left: left,
+    visibility: visible ? 'visible' : 'hidden'
+  }"
+>
+  <div class="tooltip-arrow"></div>
+  <div class="tooltip-content">{{ text }}</div>
+</div>
+<div
+  class="app-tooltip init-tooltip-container {{ initPosition || 'bottom' }}"
+  [ngStyle]="{
+    top: initTop,
+    left: initLeft,
+    visibility:  'hidden',
+  }"
+>
+  <div class="tooltip-arrow"></div>
+  <div class="tooltip-content">{{ text }}</div>
+</div>

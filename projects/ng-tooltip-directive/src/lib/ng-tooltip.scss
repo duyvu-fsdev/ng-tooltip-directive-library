@@ -1,0 +1,95 @@
+.app-tooltip {
+  --background-color: var(--tooltip-background, #26292c);
+  --color: var(--tooltip-color, #f4f5f8);
+  --max-width: var(--tooltip-max-width, fit-content);
+  --height: var(--tooltip-height, fit-content);
+  --border-radius: var(--tooltip-border-radius, 4px);
+  --padding: var(--tooltip-padding, 6px 8px);
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.init-tooltip-container,
+.tooltip-container {
+  position: fixed;
+  background-color: var(--background-color);
+  color: var(--color);
+  padding: var(--padding);
+  border-radius: var(--border-radius);
+  z-index: 1000;
+  max-width: var(--max-width);
+  height: var(--height);
+  visibility: hidden;
+
+  .tooltip-content {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+}
+
+.init-tooltip-container,
+.tooltip-container {
+  &.top {
+    transform: translate(-50%, -100%);
+    .tooltip-arrow {
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px 5px 0;
+      border-style: solid;
+      border-color: var(--background-color) transparent transparent transparent;
+    }
+  }
+}
+
+.init-tooltip-container,
+.tooltip-container {
+  &.bottom {
+    transform: translateX(-50%);
+    .tooltip-arrow {
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 0 5px 5px;
+      border-style: solid;
+      border-color: transparent transparent var(--background-color) transparent;
+    }
+  }
+}
+
+.init-tooltip-container,
+.tooltip-container {
+  &.left {
+    transform: translate(-100%, -50%);
+    .tooltip-arrow {
+      top: 50%;
+      right: -5px;
+      transform: translateY(-50%);
+      border-width: 5px 0 5px 5px;
+      border-style: solid;
+      border-color: transparent transparent transparent var(--background-color);
+    }
+  }
+}
+
+.init-tooltip-container,
+.tooltip-container {
+  transform: translateY(-50%);
+  &.right {
+    .tooltip-arrow {
+      top: 50%;
+      left: -5px;
+      transform: translateY(-50%);
+      border-width: 5px 5px 5px 0;
+      border-style: solid;
+      border-color: transparent var(--background-color) transparent transparent;
+    }
+  }
+}

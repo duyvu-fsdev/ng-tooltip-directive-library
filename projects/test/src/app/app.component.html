@@ -1,0 +1,28 @@
+<main class="main">
+  <div class="container">
+    <button tooltip [tooltipOption]="tooltipOptiontop">top</button>
+    <div class="mid">
+      <button tooltip [tooltipOption]="tooltipOptionleft">left</button>
+      <button
+        tooltip
+        [tooltipOption]="{ text: 'Custom style via variables', class: 'custom-variables' }"
+      >
+        Custom style via variables
+      </button>
+      <span tooltip [tooltipOption]="{ position: 'bottom', text: 'This is span tag' }">
+        default
+      </span>
+      <button tooltip [tooltipOption]="{ text: 'Custom style via class', class: 'custom-css' }">
+        Custom style via class
+      </button>
+      <button tooltip [tooltipOption]="tooltipOptionright">right</button>
+    </div>
+    <button tooltip [tooltipOption]="tooltipOptionbottom">bottom</button>
+  </div>
+  <my-component tooltip [tooltipOption]="{ text: 'This is my-component',  }"></my-component>
+
+  <other-component></other-component>
+  <h3>Resize the browser window to see the tooltip's position auto-adjust</h3>
+</main>
+
+<router-outlet />
