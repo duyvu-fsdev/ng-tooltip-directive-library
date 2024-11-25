@@ -1,6 +1,6 @@
 {
   "name": "@duyvu-fsdev/ng-tooltip-directive",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "author": {
     "name": "duyvu-fsdev",
     "email": "duyvu.fullstackdev@gmail.com"
@@ -18,6 +18,14 @@
     "ng tooltip",
     "duyvu-fsdev"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duyvu-fsdev/ng-tooltip-directive-library"
+  },
+  "homepage": "https://github.com/duyvu-fsdev/ng-tooltip-directive-library/blob/main/projects/ng-tooltip-directive/README.md",
+  "bugs": {
+    "url": "https://github.com/duyvu-fsdev/ng-tooltip-directive-library/issues"
+  },
   "peerDependencies": {
     "@angular/common": "^18.2.0",
     "@angular/core": "^18.2.0"
