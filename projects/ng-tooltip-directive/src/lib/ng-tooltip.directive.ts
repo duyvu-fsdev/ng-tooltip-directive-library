@@ -1,38 +1,26 @@
-import {
-  Directive,
-  Input,
-  ElementRef,
-  HostListener,
-  Renderer2,
-  ViewContainerRef,
-  ComponentRef,
-  AfterViewInit,
-  Inject,
-} from "@angular/core";
-
-import { Option, Position } from "./ng-tooltip.model";
 import { DOCUMENT } from "@angular/common";
+import { AfterViewInit, ComponentRef, Directive, ElementRef, HostListener, Inject, Input, ViewContainerRef } from "@angular/core";
 import { TooltipComponent } from "./ng-tooltip.component";
+import { Option, Position } from "./ng-tooltip.model";
 
 @Directive({
   selector: "[tooltip]",
 })
 export class TooltipDirective implements AfterViewInit {
   @Input("tooltipOption") option!: Option;
+
   private tooltipComponentRef!: ComponentRef<TooltipComponent>;
 
-  constructor(
-    private el: ElementRef,
-    private viewContainerRef: ViewContainerRef,
-    @Inject(DOCUMENT) private document: Document
-  ) {}
+  constructor(private el: ElementRef, private viewContainerRef: ViewContainerRef, @Inject(DOCUMENT) private document: Document) {}
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    this.option.position = this.option.position ?? "bottom";
+    this.option.class = this.option.class ?? "";
+  }
 
   @HostListener("mouseenter") onMouseEnter() {
     this.showTooltip();
   }
-
   @HostListener("mouseleave") onMouseLeave() {
     this.hideTooltip();
   }
@@ -70,7 +58,7 @@ export class TooltipDirective implements AfterViewInit {
     tooltipInstance.visible = false;
 
     setTimeout(() => {
-      const tooltipEl = this.tooltipComponentRef.location.nativeElement.querySelector(".tooltip-container");
+      const tooltipEl = this.tooltipComponentRef.location.nativeElement.querySelector(".tooltip-container") as HTMLElement;
       if (this.option.class) tooltipEl.classList.add(this.option.class);
       this.adjustPosition(tooltipEl).then((position) => {
         const { left, top } = this.getStandardPosition(position);
@@ -91,7 +79,6 @@ export class TooltipDirective implements AfterViewInit {
       const isOverRight = right > windowWidth;
       const isOverTop = top < 0;
       const isOverBottom = bottom > windowHeight;
-
       if (!isOverLeft && !isOverRight && !isOverBottom && !isOverTop) resolve(this.option.position ?? "bottom");
       else if (isOverLeft && isOverRight && isOverBottom && isOverTop) resolve("bottom");
       else if (this.option.position === "top") {
