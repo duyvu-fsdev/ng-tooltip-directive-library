@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { Position } from "./ng-tooltip.model";
 
 @Component({
@@ -7,13 +7,9 @@ import { Position } from "./ng-tooltip.model";
   styleUrls: ["./ng-tooltip.scss"],
 })
 export class TooltipComponent {
-  @Input() position: Position;
-  @Input() initPosition: Position;
+  @Input() position: Position = "bottom";
   @Input() top!: string;
-  @Input() initTop!: string;
   @Input() left!: string;
-  @Input() initLeft!: string;
   @Input() visible: boolean = false;
-  @Input() text!: string;
-  @Input() class?: string;
+  @Input() text: string = "";
 }

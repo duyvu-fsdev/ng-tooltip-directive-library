@@ -10,7 +10,6 @@
   }
 }
 
-.init-tooltip-container,
 .tooltip-container {
   position: fixed;
   background-color: var(--background-color);
@@ -34,7 +33,6 @@
   }
 }
 
-.init-tooltip-container,
 .tooltip-container {
   &.top {
     transform: translate(-50%, -100%);
@@ -49,7 +47,6 @@
   }
 }
 
-.init-tooltip-container,
 .tooltip-container {
   &.bottom {
     transform: translateX(-50%);
@@ -64,7 +61,6 @@
   }
 }
 
-.init-tooltip-container,
 .tooltip-container {
   &.left {
     transform: translate(-100%, -50%);
@@ -79,10 +75,9 @@
   }
 }
 
-.init-tooltip-container,
 .tooltip-container {
-  transform: translateY(-50%);
   &.right {
+    transform: translateY(-50%);
     .tooltip-arrow {
       top: 50%;
       left: -5px;

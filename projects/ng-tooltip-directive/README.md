@@ -170,13 +170,16 @@ Or set box-sizing for all elements in your project (recommended):
 
 # Version
 
-[1.0.1](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.0.1) - Update Usage
+[2.0.0](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/2.0.0) - (Big Update) Clean code, fix styles, remove init tooltip.
+
+[1.1.3](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.1.3) - Update Repository - Homepage
+
+[1.1.1](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.1.1)
+[1.1.2](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.1.2) - Update demo
 
 [1.1.0](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.1.0) - Fix styles, Update Usage
 
-[1.1.1](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.1.1)
-
-[1.1.2](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.1.2) - Update demo
+[1.0.1](https://www.npmjs.com/package/@duyvu-fsdev/ng-tooltip-directive/v/1.0.1) - Update Usage
 
 # License
 

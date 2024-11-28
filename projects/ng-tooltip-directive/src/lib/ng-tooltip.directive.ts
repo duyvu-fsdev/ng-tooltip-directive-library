@@ -21,22 +21,13 @@ export class TooltipDirective implements AfterViewInit {
   @Input("tooltipOption") option!: Option;
   private tooltipComponentRef!: ComponentRef<TooltipComponent>;
 
-  position: Position;
-  initPosition: Position;
-  visible: boolean = false;
-  text!: string;
-  class?: string;
   constructor(
     private el: ElementRef,
-    private renderer: Renderer2,
     private viewContainerRef: ViewContainerRef,
     @Inject(DOCUMENT) private document: Document
   ) {}
-  private hostEl!: HTMLElement;
-  ngAfterViewInit() {
-    this.hostEl = this.el.nativeElement;
-    // this.createInitTooltip();
-  }
+
+  ngAfterViewInit() {}
 
   @HostListener("mouseenter") onMouseEnter() {
     this.showTooltip();
@@ -46,12 +37,7 @@ export class TooltipDirective implements AfterViewInit {
     this.hideTooltip();
   }
 
-  private getHostPosition(hostEl: HTMLElement): {
-    w: number;
-    h: number;
-    l: number;
-    t: number;
-  } {
+  private getHostPosition(hostEl: HTMLElement): { w: number; h: number; l: number; t: number } {
     if (!hostEl) return { h: 0, w: 0, l: 0, t: 0 };
     const styles = getComputedStyle(hostEl);
     const { left, top, height, width } = hostEl.getBoundingClientRect();
@@ -63,7 +49,7 @@ export class TooltipDirective implements AfterViewInit {
   }
 
   getStandardPosition(p: Position): { top: number; left: number } {
-    const { h, w, l, t } = this.getHostPosition(this.hostEl);
+    const { h, w, l, t } = this.getHostPosition(this.el.nativeElement);
     if (p === "top") return { left: l + w / 2, top: t - 6 };
     if (p === "left") return { left: l - 6, top: t + h / 2 };
     if (p === "right") return { left: l + w + 6, top: t + h / 2 };
@@ -75,118 +61,100 @@ export class TooltipDirective implements AfterViewInit {
     this.tooltipComponentRef = factory;
     const tooltipInstance = this.tooltipComponentRef.instance;
     const tooltipEl = this.tooltipComponentRef.location.nativeElement;
-    this.initPosition = this.option.position ?? "bottom";
-    const { left, top } = this.getStandardPosition(this.initPosition);
-    tooltipInstance.initPosition = this.initPosition;
-    tooltipInstance.class = this.option.class;
-    tooltipInstance.initLeft = `${left}px`;
-    tooltipInstance.initTop = `${top}px`;
+    this.document.body.appendChild(tooltipEl);
+    const { left, top } = this.getStandardPosition(this.option.position ?? "bottom");
+    tooltipInstance.position = this.option.position ?? "bottom";
     tooltipInstance.text = this.option.text;
+    tooltipInstance.left = `${left}px`;
+    tooltipInstance.top = `${top}px`;
     tooltipInstance.visible = false;
 
-    this.document.body.appendChild(tooltipEl);
-    this.adjustPosition().then(() => {
-      const { left, top } = this.getStandardPosition(this.position);
-      tooltipInstance.position = this.position;
-      tooltipInstance.left = `${left}px`;
-      tooltipInstance.top = `${top}px`;
-      tooltipInstance.visible = true;
-      const tooltipEl = (
-        this.tooltipComponentRef.location.nativeElement as HTMLElement
-      ).querySelector(".tooltip-container") as HTMLElement;
-
-      if (this.option.class) {
-        tooltipEl.classList.add(this.option.class);
-        this.initTooltipEl.classList.add(this.option.class);
-      }
-    });
+    setTimeout(() => {
+      const tooltipEl = this.tooltipComponentRef.location.nativeElement.querySelector(".tooltip-container");
+      if (this.option.class) tooltipEl.classList.add(this.option.class);
+      this.adjustPosition(tooltipEl).then((position) => {
+        const { left, top } = this.getStandardPosition(position);
+        tooltipInstance.position = position;
+        tooltipInstance.left = `${left}px`;
+        tooltipInstance.top = `${top}px`;
+        tooltipInstance.visible = true;
+      });
+    }, 1);
   }
-  initTooltipEl!: HTMLElement;
-  private adjustPosition(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const initTooltipEl = (
-          this.tooltipComponentRef.location.nativeElement as HTMLElement
-        ).querySelector(".init-tooltip-container") as HTMLElement;
-        if (!initTooltipEl) {
-          resolve();
-          return;
-        }
-        this.initTooltipEl = initTooltipEl;
-        const { left, right, top, bottom } = initTooltipEl.getBoundingClientRect();
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const isOverLeft = left < 0;
-        const isOverRight = right > windowWidth;
-        const isOverTop = top < 0;
-        const isOverBottom = bottom > windowHeight;
 
-        if (!isOverLeft && !isOverRight && !isOverBottom && !isOverTop)
-          this.position = this.initPosition;
-        else if (isOverLeft && isOverRight && isOverBottom && isOverTop) this.position = "bottom";
-        else if (this.initPosition === "top") {
-          if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "top";
-          if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "bottom";
-          if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "top";
-          if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "right";
-          if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "left";
-          if (isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "top";
-          if (isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && isOverTop) this.position = "left";
-        } else if (this.initPosition === "left") {
-          if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "left";
-          if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "right";
-          if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "left";
-          if (isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "top";
-          if (isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && isOverTop) this.position = "left";
-        } else if (this.initPosition === "right") {
-          if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "right";
-          if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "right";
-          if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "right";
-          if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "right";
-          if (isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "top";
-          if (isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && isOverTop) this.position = "left";
-        } else if (this.initPosition === "bottom") {
-          if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "top";
-          if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "bottom";
-          if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) this.position = "right";
-          if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "left";
-          if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "right";
-          if (isOverLeft && isOverRight && isOverBottom && !isOverTop) this.position = "top";
-          if (isOverLeft && isOverRight && !isOverBottom && isOverTop) this.position = "bottom";
-          if (isOverLeft && !isOverRight && isOverBottom && isOverTop) this.position = "right";
-          if (!isOverLeft && isOverRight && isOverBottom && isOverTop) this.position = "left";
-        }
-        resolve();
-      }, 100);
+  private adjustPosition(initTooltipEl: HTMLElement): Promise<Position> {
+    return new Promise((resolve) => {
+      const { left, right, top, bottom } = initTooltipEl.getBoundingClientRect();
+      const windowWidth = document.documentElement.clientWidth;
+      const windowHeight = document.documentElement.clientHeight;
+      const isOverLeft = left < 0;
+      const isOverRight = right > windowWidth;
+      const isOverTop = top < 0;
+      const isOverBottom = bottom > windowHeight;
+
+      if (!isOverLeft && !isOverRight && !isOverBottom && !isOverTop) resolve(this.option.position ?? "bottom");
+      else if (isOverLeft && isOverRight && isOverBottom && isOverTop) resolve("bottom");
+      else if (this.option.position === "top") {
+        if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("top");
+        if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("bottom");
+        if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("top");
+        if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("right");
+        if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("left");
+        if (isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("top");
+        if (isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && isOverTop) resolve("left");
+      } else if (this.option.position === "left") {
+        if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("left");
+        if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("right");
+        if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("left");
+        if (isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("top");
+        if (isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && isOverTop) resolve("left");
+      } else if (this.option.position === "right") {
+        if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("right");
+        if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("right");
+        if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("right");
+        if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("right");
+        if (isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("top");
+        if (isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && isOverTop) resolve("left");
+      } else if (this.option.position === "bottom") {
+        if (isOverLeft && !isOverRight && !isOverBottom && !isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("top");
+        if (!isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("bottom");
+        if (isOverLeft && isOverRight && !isOverBottom && !isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && !isOverTop) resolve("right");
+        if (isOverLeft && !isOverRight && !isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("left");
+        if (!isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("right");
+        if (isOverLeft && isOverRight && isOverBottom && !isOverTop) resolve("top");
+        if (isOverLeft && isOverRight && !isOverBottom && isOverTop) resolve("bottom");
+        if (isOverLeft && !isOverRight && isOverBottom && isOverTop) resolve("right");
+        if (!isOverLeft && isOverRight && isOverBottom && isOverTop) resolve("left");
+      }
     });
   }
   private hideTooltip() {
